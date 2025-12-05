@@ -22,3 +22,8 @@
         "nodemon": "^3.1.11"
       }
     }
+**.env**
+        DB_URL=mongodb://localhost:27017/DB_NAME
+        EMAIL_USER=email@gmail.com
+        EMAIL_PASS=APP_PASSWORD
+
