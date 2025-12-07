@@ -1,28 +1,25 @@
-require("dotenv").config()
-const express=require('express');
-const app=express();
-const cors=require("cors")
+const express = require('express');
+const cors = require('cors');
+const router = require('./src/routes');
+const StartServer = require('./utils/startServer');
 
+const app = express();
 
-const router = require("./src/routes");
-const StartServer = require("./utils/startServer");
+app.use(express.json());
+app.use(cors());
+app.use(router);
 
-app.use(express.json())
-app.use(cors()) //cross origin resource sharing
-app.use(router)
-
-
-//middleware for exception handling
-app.use((err,req,res,next)=>{
-    console.log("Error:",err.stack|| err);
-    const statusCode=err.statusCode||err.code||500;
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error("Error:", err.stack || err);
+    const statusCode = err.statusCode || err.code || 500;
     res.status(statusCode).json({
-        data:null,
-        msg:err.msg||"Something went wrong",
-        status:false,
-        meta:null
-    })
-})
+        data: null,
+        msg: err.message || "Something went wrong",
+        status: false,
+        meta: null
+    });
+});
 
-//start server
-StartServer();
+// Start server + MongoDB
+StartServer(app);

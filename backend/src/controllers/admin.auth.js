@@ -1,57 +1,71 @@
+const bcrypt=require('bcrypt')
 const AdminData = require('../model/admin.model');
-
 const sendOtpEmail=require("../../utils/sendOTP");
 const adminSVC = require('../services/admin.auth.service');
 
 class AdminAuthentication {
 
     // ------------------- REGISTER ADMIN -------------------
-    register = async (req, res, next) => {
-        try {
-            // 1. Validate email format using Joi
-            const validatedData = await adminSVC.registerAdmin(req.body);
+   register = async (req, res, next) => {
+    try {
+        console.log("Req body:", req.body);
 
-            // 2. Check if a first admin already exists
-            const existingAdmin = await AdminData.findOne();
+        const validatedData = await adminSVC.registerAdmin(req.body);
 
-            if (existingAdmin) {
-                // ❌ Stop execution immediately for subsequent registrations
-                return res.status(403).json({
-                    success: false,
-                    message: "Only the first admin can be registered. Further registrations are not allowed."
-                });
-            }
-
-            // 3. Mark as first admin
-            validatedData.isInitialAdmin = true;
-
-            // 4. Save admin in DB
-            const newAdmin = new AdminData(validatedData);
-            const savedAdmin = await newAdmin.save();
-
-            // 5. Respond with success
-            res.status(201).json({
-                success: true,
-                message: "Admin registered successfully",
-                data: savedAdmin
+        if (!validatedData) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid request data"
             });
-
-        } catch (error) {
-            next(error);
         }
-    };
+
+        validatedData.isInitialAdmin = true;
+
+        const existingAdmin = await AdminData.findOne();
+        if (existingAdmin) {
+            return res.status(403).json({
+                success: false,
+                message: "Only the first admin can be registered."
+            });
+        }
+
+        const newAdmin = new AdminData(validatedData);
+        const savedAdmin = await newAdmin.save();
+
+        res.status(201).json({
+            success: true,
+            message: "Admin registered successfully",
+            data: savedAdmin
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 
     // ------------------- LOGIN ADMIN -------------------
+
+
    login = async (req, res, next) => {
     try {
-        const { email } = await adminSVC.loginAdmin(req.body);
+        let {email}= await adminSVC.loginAdmin(req.body);
+
 
         const admin = await AdminData.findOne({ email });
         if (!admin) return res.status(404).json({ success: false, message: "Admin not found" });
 
+
+        // otp is generated here
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-        admin.otp = otp;
+        //otp is to be hashed and saved to db because it is statefull session
+
+        // admin.otp = otp;->this method save string of otp
+
+        const saltRounds=10;
+        const hashedOTP=await bcrypt.hash(otp,saltRounds);
+        admin.otp=hashedOTP;
         admin.otpExpires = Date.now() + 1 * 60 * 1000;
         await admin.save();
 
@@ -66,7 +80,7 @@ class AdminAuthentication {
     } catch (error) {
         next(error);
     }
-};
+}
 
 
     // ------------------- VERIFY OTP -------------------
@@ -77,10 +91,17 @@ class AdminAuthentication {
             const admin = await AdminData.findOne({ email });
             if (!admin) return res.status(404).json({ message: "Admin not found" });
 
-            if (admin.otp !== otp) return res.status(400).json({ message: "Invalid OTP" });
+
+//Comparing otp with hashed value of otp
+            const isMatched=  bcrypt.compare(otp,admin.otp)
+            if(!isMatched){
+                return res.status(400).json({ message: "Invalid OTP" });
+            }
+            
 
             if (Date.now() > admin.otpExpires) return res.status(400).json({ message: "OTP expired" });
 
+            //clear otp after verification
             admin.otp = null;
             admin.otpExpires = null;
             await admin.save();
@@ -90,9 +111,9 @@ class AdminAuthentication {
         } catch (error) {
             next(error);
         }
-    };
+    }
 
 }
 
-const adminAUTH = new AdminAuthentication();
+const adminAUTH = new AdminAuthentication()
 module.exports = adminAUTH;

@@ -6,7 +6,6 @@ class NoticeValidation{
             let rules=Joi.object({
                 title: Joi.string().min(3).max(200).required(),
                 description: Joi.string().min(5).required(),
-               
                 image: Joi.string().optional().allow(null, "")
 
 

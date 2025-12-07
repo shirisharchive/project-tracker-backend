@@ -4,7 +4,11 @@ const bannerCTRL = require('../controllers/banner.auth');
 const noticeCTRL = require('../controllers/notice.auth');
 const projectCTRL = require('../controllers/project.status.auth');
 
+
+
 const adminRouter=require('express').Router();
+
+
 
 //for projects
 adminRouter.post("/addProject",projectCTRL.validateProject);

@@ -150,5 +150,5 @@ class ProjectController {
 
 }
 
-const projectCTRL = new ProjectController();
+const projectCTRL = new ProjectController()
 module.exports = projectCTRL;

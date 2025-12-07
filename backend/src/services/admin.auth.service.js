@@ -10,25 +10,38 @@ class AdminAuth {
                     .required()
                     .lowercase()
                     .label('Email Address')
-            });
-            return await rules.validateAsync(data, { abortEarly: false });
+            })
+            return await rules.validateAsync(data)
+             
         } catch (error) {
-            throw error;
+            throw (error)
         }
-    };
+    }
 
     loginAdmin = async (data) => {
-        let rules = Joi.object({
-            email: Joi.string()
-                .email({ tlds: { allow: false } })
-                .required()
-                .lowercase()
-                .label('Email Address'),
-        });
-        return await rules.validateAsync(data);
-    };
+       try {
+            let rules = Joi.object({
+                email: Joi.string()
+                    .email({ tlds: { allow: false } })
+                    .required()
+                    .lowercase()
+                    .label('Email Address')
+            })
+            return await rules.validateAsync(data)
+           
+           
+
+
+        } catch (error) {
+            throw (error)
+        }
+        
+        
+
+    }
 
     verifyOtpAdmin = async (data) => {
+        try{
         // 1. Validate email + otp
         let rules = Joi.object({
             email: Joi.string()
@@ -43,10 +56,15 @@ class AdminAuth {
                 .required()
                 .label("OTP")
         });
+          return await rules.validateAsync(data);
+          } catch (error) {
+            throw (error)
+        }
+        
 
-        return await rules.validateAsync(data);
-    };
-}
+      
+    
+}}
 
-const adminSVC = new AdminAuth();
-module.exports = adminSVC;
+const adminSVC = new AdminAuth()
+module.exports = adminSVC

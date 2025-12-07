@@ -1,30 +1,23 @@
-const express=require("express");
+
 const connectDB = require("../src/model/connectDB");
-const app=express()
+
+const StartServer = async (app) => {
+    try {
+        const PORT = process.env.PORT || 3000;
+
+        // Connect to MongoDB first
+        await connectDB();
 
 
-//making server that listen on port no 3000
-const StartServer=async()=>{
-    try{
-        app.listen(3000,'localhost',(error)=>{
-            if(!error){
-                console.log("Server is on ");
-        //mongoconnection.
-        connectDB();
-                
-        }
-        else{
-            console.log("Error connecting the server",error);
-            process.exit(1)
-        }
+        // Start Express server
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
 
-        })
-
+    } catch (error) {
+        console.log("Error starting server:", error);
+        process.exit(1);
     }
-    catch(error)
-    {
-        throw(error)
-    }
-}
+};
 
-module.exports=StartServer;
+module.exports = StartServer;

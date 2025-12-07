@@ -84,4 +84,5 @@ class NoticeController {
 
 }
 
-module.exports = new NoticeController();
+const noticeCTRL=new NoticeController();
+module.exports=noticeCTRL
