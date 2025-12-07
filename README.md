@@ -46,7 +46,8 @@ Finally, in Postman I tried changing Text to Json it worked.And interesting part
 
 <img width="927" height="596" alt="image" src="https://github.com/user-attachments/assets/4c5d54ba-f583-4994-b570-8977e7303e62" />
 
-<img width="698" height="673" alt="image" src="https://github.com/user-attachments/assets/d8c4611b-6bd7-41bb-9100-b05df1286059" />
+<img width="1035" height="728" alt="image" src="https://github.com/user-attachments/assets/04f38038-23a8-4dc4-b5eb-dedee9298b4f" />
+
 
 
 
